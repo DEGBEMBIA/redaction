@@ -12,7 +12,7 @@ test.describe('Flux complet : Soumission et Notation', () => {
     await page.getByPlaceholder('ex: admin').fill('admin');
     await page.getByPlaceholder('••••••').fill('admin123');
     await page.getByRole('button', { name: 'Se connecter' }).click();
-    await expect(page.getByText('Tableau de bord')).toBeVisible();
+    await expect(page.locator('h1')).toContainText('Tableau de bord');
   });
 
   test('flux complet : créer classe → élève → exercice → soumission → noter', async ({ page }) => {

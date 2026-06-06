@@ -9,7 +9,7 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
     await page.getByPlaceholder('ex: admin').fill('admin');
     await page.getByPlaceholder('••••••').fill('admin123');
     await page.getByRole('button', { name: 'Se connecter' }).click();
-    await expect(page.getByText('Tableau de bord')).toBeVisible();
+    await expect(page.locator('h1')).toContainText('Tableau de bord');
   });
 
   test.describe('Classes', () => {

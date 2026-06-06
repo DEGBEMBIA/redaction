@@ -17,7 +17,7 @@ test.describe('Authentification', () => {
     await page.click('button:has-text("Se connecter")');
 
     // Vérifier qu'on est redirigé vers le tableau de bord
-    await expect(page.locator('text=Tableau de bord')).toBeVisible();
+    await expect(page.locator('h1')).toContainText('Tableau de bord');
     await expect(page.locator('text=Suivi Rédaction')).toBeVisible();
     // Vérifier le profil utilisateur dans la sidebar
     await expect(page.locator('text=Professeur Admin')).toBeVisible();
