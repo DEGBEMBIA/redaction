@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Data (SQLite database files - handled via volumes)
+data/
+*.db
+*.db-wal
+*.db-shm

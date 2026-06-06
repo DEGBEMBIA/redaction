@@ -1,0 +1,283 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  # ─── Job 1 : Serveur — typecheck + tests + coverage ─────────────────────
+  server:
+    name: Serveur (tests + coverage)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: server
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install native build tools
+        run: sudo apt-get update && sudo apt-get install -y build-essential python3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript typecheck
+        run: npx tsc --noEmit
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-server
+          path: server/coverage/
+          retention-days: 7
+
+  # ─── Job 2 : Client — build + tests + coverage ──────────────────────────
+  client:
+    name: Client (tests + build)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: client
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Build production bundle (inclut le typecheck)
+        run: npm run build
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-client
+          path: client/coverage/
+          retention-days: 7
+
+      - name: Upload production build
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-build
+          path: client/dist/
+          retention-days: 7
+
+  # ─── Job 3 : Couverture globale et badges ───────────────────────────────
+  coverage:
+    name: Badges de couverture
+    needs: [server, client]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Download server coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-server
+          path: server/coverage/
+
+      - name: Download client coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-client
+          path: client/coverage/
+
+      - name: Generate badges
+        run: node scripts/generate-badges.js
+
+      - name: Upload badges as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-badges
+          path: badges/
+          retention-days: 30
+
+  # ─── Job 4 : Tests E2E (Playwright) — nécessite serveur + client ──────
+  e2e:
+    name: Tests E2E (Playwright)
+    needs: [server, client]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install native build tools (for better-sqlite3)
+        run: sudo apt-get update && sudo apt-get install -y build-essential python3
+
+      - name: Install server dependencies
+        run: npm ci
+        working-directory: server
+
+      - name: Install client dependencies (inclut @playwright/test)
+        run: npm ci
+        working-directory: client
+
+      - name: Install Playwright Chromium (with system deps)
+        run: npx playwright install --with-deps chromium
+        working-directory: client
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        working-directory: client
+        env:
+          CI: true
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: client/playwright-report/
+          retention-days: 7
+
+      - name: Upload test screenshots (on failure)
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-screenshots
+          path: client/test-results/
+          retention-days: 7
+
+  # ─── Job 5 : Déploiement automatique sur le VPS (main/master uniquement) ──
+  deploy:
+    name: Déploiement Docker
+    needs: [server, client, e2e]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Vérifier rsync
+        run: which rsync || sudo apt-get install -y rsync
+
+      - name: Setup SSH (clé décodée depuis base64)
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" | base64 -d > ~/.ssh/deploy_key 2>/dev/null || \
+            echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          cat >> ~/.ssh/config << 'EOF'
+          Host vps
+            HostName ${{ secrets.VPS_HOST }}
+            User root
+            IdentityFile ~/.ssh/deploy_key
+            StrictHostKeyChecking no
+          EOF
+          echo "✅ SSH configuré vers ${{ secrets.VPS_HOST }}"
+
+      - name: Créer les dossiers distants
+        run: |
+          ssh vps "mkdir -p /opt/redaction/data /opt/redaction/backups"
+          echo "✅ Dossiers distants prêts"
+
+      - name: Copier les sources vers le VPS (structure préservée)
+        run: |
+          # Copier les répertoires entiers (sans node_modules/.git)
+          rsync -az --delete --exclude='node_modules' --exclude='.git' \
+            server/ vps:/opt/redaction/server/
+          rsync -az --delete --exclude='node_modules' --exclude='.git' --exclude='dist' \
+            client/ vps:/opt/redaction/client/
+          scp docker-compose.yml vps:/opt/redaction/
+          scp deploy/deploy.sh vps:/opt/redaction/
+          echo "✅ Sources copiées"
+
+      - name: Créer le .env avec le JWT_SECRET
+        run: |
+          ssh vps "cat > /opt/redaction/.env << ENVEOF
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          ENVEOF
+          "
+          echo "✅ .env configuré"
+
+      - name: Connexion Docker Hub (évite les limites de taux)
+        run: |
+          echo "${{ secrets.DOCKER_PAT }}" | ssh vps "docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin"
+          echo "✅ Connecté à Docker Hub en tant que ${{ secrets.DOCKER_USERNAME }}"
+
+      - name: Exécuter le déploiement
+        run: |
+          ssh vps "cd /opt/redaction && bash deploy.sh"
+          echo "✅ Déploiement terminé"
+
+      - name: Vérifier la santé du déploiement
+        run: |
+          sleep 10
+          curl -sf "http://${{ secrets.VPS_HOST }}/api/health" && echo "✅ API opérationnelle"
+          curl -sf "http://${{ secrets.VPS_HOST }}:8080/" -o /dev/null && echo "✅ Frontend opérationnel"
+          echo "🎉 Déploiement réussi sur http://${{ secrets.VPS_HOST }}:8080"
+
+  # ─── Job 6 : Résumé ─────────────────────────────────────────────────────
+  ci-result:
+    name: Résultat CI
+    needs: [server, client, e2e]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check all jobs passed
+        run: |
+          echo "✅ Serveur  : ${{ needs.server.result }}"
+          echo "✅ Client   : ${{ needs.client.result }}"
+          echo "🎭 E2E      : ${{ needs.e2e.result }}"
+          if [ "${{ needs.server.result }}" != "success" ] || [ "${{ needs.client.result }}" != "success" ] || [ "${{ needs.e2e.result }}" != "success" ]; then
+            echo "❌ Certains tests ont échoué !"
+            exit 1
+          fi
+          echo "🎉 Tous les tests sont verts !"

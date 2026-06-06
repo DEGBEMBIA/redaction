@@ -1,0 +1,41 @@
+# Dépendances
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+
+# Environnement
+.env
+.env.local
+.env.*.local
+
+# Base de données (SQLite - uniquement en dev/test)
+*.db
+*.db-wal
+*.db-shm
+server/data/
+
+# Tests et couverture
+coverage/
+playwright-report/
+test-results/
+
+# IDE et éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Docker
+docker-compose.override.yml

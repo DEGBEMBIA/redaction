@@ -1,0 +1,14 @@
+node_modules/
+npm-debug.log*
+dist/
+*.tsbuildinfo
+.env
+.env.local
+data/
+*.db
+*.db-wal
+*.db-shm
+.git/
+.gitignore
+Dockerfile
+.dockerignore
