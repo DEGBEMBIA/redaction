@@ -63,7 +63,9 @@ test.describe('Flux complet : Soumission et Notation', () => {
 
     // Créer
     await page.locator('.fixed button:has-text("Créer")').click();
-    await expect(page.getByText(EXERCISE_TITLE)).toBeVisible({ timeout: 5000 });
+    // Scope au tableau pour éviter de matcher l'<option> dans le select filtre
+    const table = page.locator('table');
+    await expect(table.getByText(EXERCISE_TITLE)).toBeVisible({ timeout: 5000 });
 
     // ─── 5. Noter la soumission ───
     await page.getByRole('button', { name: 'Notation' }).click();
