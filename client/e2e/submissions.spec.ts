@@ -88,8 +88,9 @@ test.describe('Flux complet : Soumission et Notation', () => {
     const commentInput = page.getByPlaceholder('Commentaire').first();
     await commentInput.fill('Très bon travail !');
 
-    // Vérifier que le score total s'affiche
-    await expect(page.locator('.text-3xl.font-bold')).toBeVisible();
+    // Vérifier que le score total s'affiche (scoper au panneau de notation)
+    const gradingPanel = page.locator('.lg\\:col-span-2');
+    await expect(gradingPanel.locator('.text-3xl.font-bold')).toBeVisible();
 
     // Enregistrer les notes
     page.once('dialog', async (dialog) => {
