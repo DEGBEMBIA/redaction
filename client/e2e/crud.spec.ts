@@ -24,7 +24,7 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
 
       // Ouvrir la modale
       await page.getByRole('button', { name: 'Ajouter une classe' }).click();
-      await expect(page.getByText('Ajouter une classe')).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Ajouter une classe' })).toBeVisible();
 
       // Remplir le formulaire
       await page.locator('input[type="text"]').first().fill(`Classe E2E ${UID}`);
@@ -43,6 +43,11 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
       const cards = page.locator('.grid > div');
       const countBefore = await cards.count();
 
+      // Accepter la boîte de dialogue confirm()
+      page.once('dialog', async (dialog) => {
+        await dialog.accept();
+      });
+
       // Cliquer sur "Suppr." (le bouton de suppression dans la card)
       await page.getByRole('button', { name: 'Suppr.' }).first().click();
 
@@ -58,7 +63,7 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
 
       // Ouvrir la modale
       await page.getByRole('button', { name: 'Ajouter un élève' }).click();
-      await expect(page.getByText('Ajouter un élève')).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Ajouter un élève' })).toBeVisible();
 
       // Remplir les champs (prénom et nom sont les 2 premiers inputs de la modale)
       const inputs = page.locator('.fixed input[type="text"]');
@@ -80,7 +85,7 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
 
       // Ouvrir la modale
       await page.getByRole('button', { name: 'Ajouter un exercice' }).click();
-      await expect(page.getByText('Ajouter un exercice')).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Ajouter un exercice' })).toBeVisible();
 
       // Titre
       await page.locator('.fixed input[type="text"]').first().fill(`Exercice E2E ${UID}`);
@@ -113,7 +118,7 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
       await page.getByRole('button', { name: "Grille d'évaluation" }).click();
 
       await page.getByRole('button', { name: 'Ajouter un critère' }).click();
-      await expect(page.getByText('Ajouter un critère')).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Ajouter un critère' })).toBeVisible();
 
       await page.locator('.fixed input[type="text"]').first().fill('Créativité');
       await page.locator('.fixed button:has-text("Ajouter")').click();

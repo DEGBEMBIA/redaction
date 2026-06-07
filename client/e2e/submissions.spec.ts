@@ -19,7 +19,7 @@ test.describe('Flux complet : Soumission et Notation', () => {
     // ─── 1. Créer une classe ───
     await page.getByRole('button', { name: 'Classes' }).click();
     await page.getByRole('button', { name: 'Ajouter une classe' }).click();
-    await expect(page.getByText('Ajouter une classe')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Ajouter une classe' })).toBeVisible();
     await page.locator('.fixed input[type="text"]').first().fill(CLASS_NAME);
     await page.locator('.fixed button:has-text("Ajouter")').click();
     await expect(page.getByText(CLASS_NAME)).toBeVisible({ timeout: 5000 });
@@ -27,7 +27,7 @@ test.describe('Flux complet : Soumission et Notation', () => {
     // ─── 2. Créer un élève ───
     await page.getByRole('button', { name: 'Élèves' }).click();
     await page.getByRole('button', { name: 'Ajouter un élève' }).click();
-    await expect(page.getByText('Ajouter un élève')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Ajouter un élève' })).toBeVisible();
     const inputs = page.locator('.fixed input[type="text"]');
     await inputs.nth(0).fill(STUDENT_FIRST);
     await inputs.nth(1).fill(STUDENT_LAST);
@@ -37,7 +37,7 @@ test.describe('Flux complet : Soumission et Notation', () => {
     // ─── 3. Créer un exercice ───
     await page.getByRole('button', { name: 'Exercices' }).click();
     await page.getByRole('button', { name: 'Ajouter un exercice' }).click();
-    await expect(page.getByText('Ajouter un exercice')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Ajouter un exercice' })).toBeVisible();
     await page.locator('.fixed input[type="text"]').first().fill(EXERCISE_TITLE);
     await page.locator('.fixed select').first().selectOption({ index: 1 });
     await page.locator('.fixed button:has-text("Ajouter")').click();
@@ -46,7 +46,7 @@ test.describe('Flux complet : Soumission et Notation', () => {
     // ─── 4. Créer une soumission ───
     await page.getByRole('button', { name: 'Soumissions' }).click();
     await page.getByRole('button', { name: 'Nouvelle soumission' }).click();
-    await expect(page.getByText('Nouvelle soumission')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Nouvelle soumission' })).toBeVisible();
 
     // Sélectionner l'exercice et l'élève
     await page.locator('.fixed select').first().selectOption({ index: 1 });

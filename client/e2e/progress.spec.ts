@@ -61,7 +61,7 @@ test.describe('Progression', () => {
     // Créer un élève
     await page.getByRole('button', { name: 'Élèves' }).click();
     await page.getByRole('button', { name: 'Ajouter un élève' }).click();
-    await expect(page.getByText('Ajouter un élève')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Ajouter un élève' })).toBeVisible();
     const inputs = page.locator('.fixed input[type="text"]');
     await inputs.nth(0).fill('Sophie');
     await inputs.nth(1).fill('Test');
