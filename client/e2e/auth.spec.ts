@@ -17,7 +17,7 @@ test.describe('Authentification', () => {
     await page.click('button:has-text("Se connecter")');
 
     // Vérifier qu'on est redirigé vers le tableau de bord
-    await expect(page.locator('h1')).toContainText('Tableau de bord');
+    await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
     await expect(page.locator('text=Suivi Rédaction')).toBeVisible();
     // Vérifier le profil utilisateur dans la sidebar
     await expect(page.locator('text=Professeur Admin')).toBeVisible();
@@ -69,7 +69,7 @@ test.describe('Authentification', () => {
     await page.click('button:has-text("Créer un compte")');
 
     // Vérifier la connexion automatique après inscription
-    await expect(page.locator('text=Tableau de bord')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
     await expect(page.locator('text=Professeur Test')).toBeVisible();
   });
 
@@ -78,7 +78,7 @@ test.describe('Authentification', () => {
     await page.fill('input[placeholder="ex: admin"]', 'admin');
     await page.fill('input[placeholder="••••••"]', 'admin123');
     await page.click('button:has-text("Se connecter")');
-    await expect(page.locator('text=Tableau de bord')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
 
     // Se déconnecter
     await page.click('button:has-text("Déconnexion")');

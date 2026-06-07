@@ -12,7 +12,7 @@ test.describe('Flux complet : Soumission et Notation', () => {
     await page.getByPlaceholder('ex: admin').fill('admin');
     await page.getByPlaceholder('••••••').fill('admin123');
     await page.getByRole('button', { name: 'Se connecter' }).click();
-    await expect(page.locator('h1')).toContainText('Tableau de bord');
+    await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
   });
 
   test('flux complet : créer classe → élève → exercice → soumission → noter', async ({ page }) => {
@@ -95,7 +95,7 @@ test.describe('Flux complet : Soumission et Notation', () => {
 
     // ─── 6. Vérifier le tableau de bord ───
     await page.getByRole('button', { name: 'Tableau de bord' }).click();
-    await expect(page.locator('h1')).toContainText('Tableau de bord');
+    await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
   });
 
   test('la page de notation affiche un message invite quand aucune soumission', async ({ page }) => {

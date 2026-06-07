@@ -6,7 +6,7 @@ test.describe('Progression', () => {
     await page.getByPlaceholder('ex: admin').fill('admin');
     await page.getByPlaceholder('••••••').fill('admin123');
     await page.getByRole('button', { name: 'Se connecter' }).click();
-    await expect(page.locator('h1')).toContainText('Tableau de bord');
+    await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
     await page.getByRole('button', { name: 'Progression' }).click();
     await expect(page.locator('h1')).toContainText('Progression');
   });
