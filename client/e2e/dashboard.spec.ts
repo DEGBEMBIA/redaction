@@ -81,8 +81,10 @@ test.describe('Tableau de bord', () => {
     // Revenir au dashboard
     await page.getByRole('button', { name: 'Tableau de bord' }).click();
 
+    // Attendre que les stats soient chargées (la carte doit être visible)
+    await expect(page.getByText('Élèves', { exact: true })).toBeVisible({ timeout: 5000 });
     // La carte "Élèves" doit maintenant afficher "1"
     const studentsCard = page.getByText('Élèves', { exact: true }).locator('..').locator('..');
-    await expect(studentsCard.getByText('1')).toBeVisible();
+    await expect(studentsCard.getByText('1')).toBeVisible({ timeout: 5000 });
   });
 });

@@ -8,18 +8,20 @@ test.describe('Export CSV/PDF', () => {
     await page.getByRole('button', { name: 'Se connecter' }).click();
     await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
     await page.getByRole('button', { name: 'Export' }).click();
-    await expect(page.getByRole('heading', { name: 'Export' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^Export$/ })).toBeVisible();
   });
 
   test('affiche le titre et les 5 types d\'export', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'Export' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^Export$/ })).toBeVisible();
     await expect(page.getByText("Type d'export")).toBeVisible();
 
-    await expect(page.getByText('Élèves')).toBeVisible();
-    await expect(page.getByText('Classes')).toBeVisible();
-    await expect(page.getByText('Exercices')).toBeVisible();
-    await expect(page.getByText('Notes')).toBeVisible();
-    await expect(page.getByText('Statistiques')).toBeVisible();
+    // Les boutons de type d'export (scoper à la sidebar d'export pour éviter les conflits sidebar navigation)
+    const exportSidebar = page.locator('.lg\\:col-span-1');
+    await expect(exportSidebar.getByText('Élèves')).toBeVisible();
+    await expect(exportSidebar.getByText('Classes')).toBeVisible();
+    await expect(exportSidebar.getByText('Exercices')).toBeVisible();
+    await expect(exportSidebar.getByText('Notes')).toBeVisible();
+    await expect(exportSidebar.getByText('Statistiques')).toBeVisible();
   });
 
   test('affiche les boutons CSV et PDF', async ({ page }) => {
@@ -37,21 +39,24 @@ test.describe('Export CSV/PDF', () => {
   });
 
   test('bascule entre les types d\'export', async ({ page }) => {
+    const exportSidebar = page.locator('.lg\\:col-span-1');
+
     // Classes
-    await page.getByRole('button', { name: 'Classes' }).click();
+    await exportSidebar.getByRole('button', { name: 'Classes' }).click();
     await expect(page.getByText('Liste des classes')).toBeVisible();
 
     // Notes
-    await page.getByRole('button', { name: 'Notes' }).click();
+    await exportSidebar.getByRole('button', { name: 'Notes' }).click();
     await expect(page.getByText('Résultats des élèves')).toBeVisible();
 
     // Statistiques
-    await page.getByRole('button', { name: 'Statistiques' }).click();
+    await exportSidebar.getByRole('button', { name: 'Statistiques' }).click();
     await expect(page.getByText('Statistiques générales')).toBeVisible();
   });
 
   test('le tableau des classes montre la classe seed', async ({ page }) => {
-    await page.getByRole('button', { name: 'Classes' }).click();
+    const exportSidebar = page.locator('.lg\\:col-span-1');
+    await exportSidebar.getByRole('button', { name: 'Classes' }).click();
     await expect(page.getByText('6ème A')).toBeVisible();
   });
 
@@ -60,7 +65,8 @@ test.describe('Export CSV/PDF', () => {
   });
 
   test("Statistiques : les métriques seed sont affichées", async ({ page }) => {
-    await page.getByRole('button', { name: 'Statistiques' }).click();
+    const exportSidebar = page.locator('.lg\\:col-span-1');
+    await exportSidebar.getByRole('button', { name: 'Statistiques' }).click();
     await expect(page.getByText("Nombre d'élèves")).toBeVisible();
     await expect(page.getByText('Nombre de classes')).toBeVisible();
     await expect(page.getByText("Nombre d'exercices")).toBeVisible();
@@ -85,7 +91,8 @@ test.describe('Export CSV/PDF', () => {
   });
 
   test('CSV : téléchargement depuis un autre type (Classes)', async ({ page }) => {
-    await page.getByRole('button', { name: 'Classes' }).click();
+    const exportSidebar = page.locator('.lg\\:col-span-1');
+    await exportSidebar.getByRole('button', { name: 'Classes' }).click();
     await page.waitForTimeout(300);
 
     const downloadPromise = page.waitForEvent('download', { timeout: 10000 });
