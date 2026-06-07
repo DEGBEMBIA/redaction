@@ -68,21 +68,13 @@ test.describe('Flux complet : Soumission et Notation', () => {
     await expect(table.getByText(EXERCISE_TITLE)).toBeVisible({ timeout: 5000 });
 
     // ─── 5. Noter la soumission ───
-    await page.getByRole('button', { name: 'Notation' }).click();
+    // Utiliser le bouton "Noter" dans le tableau (navigue vers Grading avec submissionId auto-sélectionné)
+    const submissionRow = page.locator('tr').filter({ hasText: EXERCISE_TITLE });
+    await submissionRow.getByRole('button', { name: 'Noter' }).click();
     await expect(page.getByRole('heading', { name: 'Notation' })).toBeVisible();
 
-    // Attendre que les données soient chargées (bouton de soumission dans la sidebar)
-    const sidebar = page.locator('.lg\\:col-span-1');
-    await expect(sidebar.locator('button').first()).toBeVisible({ timeout: 10000 });
-
-    // Sélectionner la soumission dans la sidebar de notation
-    const submissionBtn = sidebar.locator(`button:has-text("${STUDENT_FIRST}")`);
-    await expect(submissionBtn).toBeVisible({ timeout: 5000 });
-    await submissionBtn.click();
-
-    // Vérifier que les critères sont visibles
-    const criteriaPanel = page.locator('.lg\\:col-span-3');
-    await expect(criteriaPanel.getByText('Orthographe')).toBeVisible();
+    // Vérifier que la soumission est auto-sélectionnée (critères visibles)
+    await expect(page.getByText('Orthographe')).toBeVisible({ timeout: 10000 });
 
     // Ajuster des notes via les inputs number
     const numberInputs = page.locator('input[type="number"]');
