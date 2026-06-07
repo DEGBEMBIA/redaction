@@ -16,7 +16,7 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
     test('affiche la page des classes avec la classe seed', async ({ page }) => {
       await page.getByRole('button', { name: 'Classes' }).click();
       await expect(page.getByRole('heading', { name: 'Classes' })).toBeVisible();
-      await expect(page.getByText('6ème A')).toBeVisible();
+      await expect(page.getByText('6ème A', { exact: true })).toBeVisible();
     });
 
     test('crée une nouvelle classe', async ({ page }) => {
