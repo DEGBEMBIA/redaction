@@ -41,20 +41,21 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
 
       // Attendre que les classes soient chargées depuis l'API
       await expect(page.locator('.grid')).toBeVisible({ timeout: 5000 });
-      const cards = page.locator('.grid > div');
-      const countBefore = await cards.count();
-      expect(countBefore).toBeGreaterThanOrEqual(1);
+
+      // Vérifier que la classe créée par le test précédent existe
+      const e2eClass = page.locator('.grid > div').filter({ hasText: `Classe E2E ${UID}` });
+      await expect(e2eClass).toBeVisible({ timeout: 5000 });
 
       // Accepter la boîte de dialogue confirm()
       page.once('dialog', async (dialog) => {
         await dialog.accept();
       });
 
-      // Cliquer sur "Suppr." (le bouton de suppression dans la card)
-      await page.getByRole('button', { name: 'Suppr.' }).first().click();
+      // Supprimer UNIQUEMENT la classe E2E créée (pas la classe seed "6ème A")
+      await e2eClass.getByRole('button', { name: 'Suppr.' }).click();
 
-      // Attendre la mise à jour
-      await expect(cards).toHaveCount(countBefore - 1);
+      // Attendre que la classe E2E disparaisse
+      await expect(e2eClass).not.toBeVisible({ timeout: 5000 });
     });
   });
 
