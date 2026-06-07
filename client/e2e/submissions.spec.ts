@@ -69,9 +69,13 @@ test.describe('Flux complet : Soumission et Notation', () => {
 
     // ─── 5. Noter la soumission ───
     await page.getByRole('button', { name: 'Notation' }).click();
+    await expect(page.getByRole('heading', { name: 'Notation' })).toBeVisible();
+
+    // Attendre que les données soient chargées dans la sidebar (compteur visible)
+    const sidebar = page.locator('.lg\\:col-span-1');
+    await expect(sidebar.getByText(/Soumissions \([1-9]\d*\)/)).toBeVisible({ timeout: 10000 });
 
     // Sélectionner la soumission dans la sidebar de notation
-    const sidebar = page.locator('.lg\\:col-span-1');
     const submissionBtn = sidebar.locator(`button:has-text("${STUDENT_FIRST}")`);
     await expect(submissionBtn).toBeVisible({ timeout: 5000 });
     await submissionBtn.click();
