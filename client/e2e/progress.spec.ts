@@ -32,10 +32,8 @@ test.describe('Progression', () => {
 
   test('la classe seed 6ème A apparaît dans le sélecteur', async ({ page }) => {
     const classSelect = page.locator('select').nth(1);
-    // Attendre que les données API soient chargées
-    await expect(classSelect.locator('option')).not.toHaveCount(1, { timeout: 5000 });
-    const options = await classSelect.locator('option').allTextContents();
-    expect(options).toContain('6ème A');
+    // Attendre que les données API soient chargées et que '6ème A' soit dans le select
+    await expect(classSelect).toContainText('6ème A', { timeout: 5000 });
   });
 
   test('les zones de graphiques sont vides par défaut', async ({ page }) => {

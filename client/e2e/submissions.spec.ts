@@ -75,7 +75,8 @@ test.describe('Flux complet : Soumission et Notation', () => {
     await submissionBtn.click();
 
     // Vérifier que les critères sont visibles
-    await expect(page.getByText('Orthographe')).toBeVisible();
+    const criteriaPanel = page.locator('.lg\\:col-span-3');
+    await expect(criteriaPanel.getByText('Orthographe')).toBeVisible();
 
     // Ajuster des notes via les inputs number
     const numberInputs = page.locator('input[type="number"]');
@@ -113,6 +114,6 @@ test.describe('Flux complet : Soumission et Notation', () => {
   test('la page soumissions affiche les filtres', async ({ page }) => {
     await page.getByRole('button', { name: 'Soumissions' }).click();
     await expect(page.locator('select')).toBeVisible();
-    await expect(page.getByText('Tous les exercices')).toBeVisible();
+    await expect(page.locator('select')).toContainText('Tous les exercices');
   });
 });
