@@ -41,7 +41,7 @@ test.describe('Flux complet : Soumission et Notation', () => {
     await page.locator('.fixed input[type="text"]').first().fill(EXERCISE_TITLE);
 
     // Attendre que les classes soient chargées dans le select
-    await expect(page.locator('.fixed select option')).toHaveCount(2, { timeout: 5000 });
+    await expect(page.locator('.fixed select').first().locator('option')).not.toHaveCount(1, { timeout: 5000 });
     await page.locator('.fixed select').first().selectOption({ index: 1 });
     await page.locator('.fixed button:has-text("Ajouter")').click();
     await expect(page.getByText(EXERCISE_TITLE)).toBeVisible({ timeout: 5000 });
@@ -52,8 +52,8 @@ test.describe('Flux complet : Soumission et Notation', () => {
     await expect(page.getByRole('heading', { name: 'Nouvelle soumission' })).toBeVisible();
 
     // Attendre que les données soient chargées dans les selects
-    await expect(page.locator('.fixed select').first().locator('option')).toHaveCount(2, { timeout: 5000 });
-    await expect(page.locator('.fixed select').nth(1).locator('option')).toHaveCount(2, { timeout: 5000 });
+    await expect(page.locator('.fixed select').first().locator('option')).not.toHaveCount(1, { timeout: 5000 });
+    await expect(page.locator('.fixed select').nth(1).locator('option')).not.toHaveCount(1, { timeout: 5000 });
     // Sélectionner l'exercice et l'élève
     await page.locator('.fixed select').first().selectOption({ index: 1 });
     await page.locator('.fixed select').nth(1).selectOption({ index: 1 });

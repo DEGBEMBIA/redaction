@@ -8,17 +8,17 @@ test.describe('Progression', () => {
     await page.getByRole('button', { name: 'Se connecter' }).click();
     await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
     await page.getByRole('button', { name: 'Progression' }).click();
-    await expect(page.getByRole('heading', { name: 'Progression' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^Progression$/ })).toBeVisible();
   });
 
   test('affiche le titre et la description', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'Progression' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^Progression$/ })).toBeVisible();
     await expect(page.getByText("Suivez l'évolution des élèves au fil du temps")).toBeVisible();
   });
 
   test('affiche les deux sélecteurs (élève et classe)', async ({ page }) => {
-    await expect(page.getByText('Élève')).toBeVisible();
-    await expect(page.getByText('Classe')).toBeVisible();
+    await expect(page.getByText('Élève', { exact: true })).toBeVisible();
+    await expect(page.getByText('Classe', { exact: true })).toBeVisible();
     await expect(page.locator('select')).toHaveCount(2);
   });
 
@@ -32,6 +32,8 @@ test.describe('Progression', () => {
 
   test('la classe seed 6ème A apparaît dans le sélecteur', async ({ page }) => {
     const classSelect = page.locator('select').nth(1);
+    // Attendre que les données API soient chargées
+    await expect(classSelect.locator('option')).not.toHaveCount(1, { timeout: 5000 });
     const options = await classSelect.locator('option').allTextContents();
     expect(options).toContain('6ème A');
   });
@@ -52,6 +54,7 @@ test.describe('Progression', () => {
   });
 
   test('sélectionner un élève est impossible sans élève seed', async ({ page }) => {
+    // Pas d'élèves seed → le select ne montre que l'option par défaut
     const select = page.locator('select').first();
     const options = await select.locator('option').all();
     expect(options.length).toBe(1); // Seulement l'option par défaut

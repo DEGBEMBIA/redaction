@@ -59,8 +59,10 @@ test.describe('Export CSV/PDF', () => {
   test('le tableau des classes montre la classe seed', async ({ page }) => {
     const exportSidebar = page.locator('.lg\\:col-span-1');
     await exportSidebar.getByRole('button', { name: 'Classes' }).click();
-    // Attendre que les données soient chargées API (le titre est synchrone, les lignes non)
-    await expect(page.getByText('ligne(s)').or(page.getByText('Aucune donnée'))).toBeVisible({ timeout: 5000 });
+    // Attendre le titre (synchrone) puis les données chargées via API
+    await expect(page.getByText('Liste des classes')).toBeVisible();
+    const dataPanel = page.locator('.lg\\:col-span-3');
+    await expect(dataPanel.getByText('ligne(s)').or(dataPanel.getByText('Aucune donnée'))).toBeVisible({ timeout: 5000 });
     await expect(page.getByText('6ème A')).toBeVisible();
   });
 
