@@ -6,7 +6,7 @@ test.describe('Authentification', () => {
   });
 
   test('affiche la page de connexion par défaut', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('Suivi Rédaction');
+    await expect(page.getByRole('heading', { name: 'Suivi Rédaction' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Se connecter' })).toBeVisible();
     await expect(page.getByText('admin / admin123')).toBeVisible();
   });
@@ -84,7 +84,7 @@ test.describe('Authentification', () => {
     await page.click('button:has-text("Déconnexion")');
 
     // Vérifier qu'on revient à la page de connexion
-    await expect(page.locator('h1')).toContainText('Suivi Rédaction');
+    await expect(page.getByRole('heading', { name: 'Suivi Rédaction' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Se connecter' })).toBeVisible();
   });
 });

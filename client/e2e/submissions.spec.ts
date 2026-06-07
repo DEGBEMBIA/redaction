@@ -100,7 +100,7 @@ test.describe('Flux complet : Soumission et Notation', () => {
 
   test('la page de notation affiche un message invite quand aucune soumission', async ({ page }) => {
     await page.getByRole('button', { name: 'Notation' }).click();
-    await expect(page.locator('h1')).toContainText('Notation');
+    await expect(page.getByRole('heading', { name: 'Notation' })).toBeVisible();
     await expect(page.getByText('Sélectionnez une soumission')).toBeVisible();
   });
 

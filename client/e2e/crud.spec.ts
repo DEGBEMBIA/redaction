@@ -15,7 +15,7 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
   test.describe('Classes', () => {
     test('affiche la page des classes avec la classe seed', async ({ page }) => {
       await page.getByRole('button', { name: 'Classes' }).click();
-      await expect(page.locator('h1')).toContainText('Classes');
+      await expect(page.getByRole('heading', { name: 'Classes' })).toBeVisible();
       await expect(page.getByText('6ème A')).toBeVisible();
     });
 
@@ -54,7 +54,7 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
   test.describe('Élèves', () => {
     test('affiche la page et crée un élève', async ({ page }) => {
       await page.getByRole('button', { name: 'Élèves' }).click();
-      await expect(page.locator('h1')).toContainText('Élèves');
+      await expect(page.getByRole('heading', { name: 'Élèves' })).toBeVisible();
 
       // Ouvrir la modale
       await page.getByRole('button', { name: 'Ajouter un élève' }).click();
@@ -76,7 +76,7 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
   test.describe('Exercices', () => {
     test('crée un exercice', async ({ page }) => {
       await page.getByRole('button', { name: 'Exercices' }).click();
-      await expect(page.locator('h1')).toContainText('Exercices');
+      await expect(page.getByRole('heading', { name: 'Exercices' })).toBeVisible();
 
       // Ouvrir la modale
       await page.getByRole('button', { name: 'Ajouter un exercice' }).click();
@@ -99,7 +99,7 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
   test.describe("Grille d'évaluation", () => {
     test('affiche les 6 critères préchargés', async ({ page }) => {
       await page.getByRole('button', { name: "Grille d'évaluation" }).click();
-      await expect(page.locator('h1')).toContainText('Grille');
+      await expect(page.getByRole('heading', { name: "Grille d'évaluation" })).toBeVisible();
 
       await expect(page.getByText('Orthographe')).toBeVisible();
       await expect(page.getByText('Grammaire')).toBeVisible();
@@ -138,7 +138,7 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
 
       for (const { button } of pages) {
         await page.getByRole('button', { name: button }).click();
-        await expect(page.locator('h1')).toBeVisible({ timeout: 5000 });
+        await expect(page.getByRole('heading')).first().toBeVisible({ timeout: 5000 });
       }
     });
   });

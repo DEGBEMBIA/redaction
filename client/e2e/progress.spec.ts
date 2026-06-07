@@ -8,11 +8,11 @@ test.describe('Progression', () => {
     await page.getByRole('button', { name: 'Se connecter' }).click();
     await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
     await page.getByRole('button', { name: 'Progression' }).click();
-    await expect(page.locator('h1')).toContainText('Progression');
+    await expect(page.getByRole('heading', { name: 'Progression' })).toBeVisible();
   });
 
   test('affiche le titre et la description', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('Progression');
+    await expect(page.getByRole('heading', { name: 'Progression' })).toBeVisible();
     await expect(page.getByText("Suivez l'évolution des élèves au fil du temps")).toBeVisible();
   });
 

@@ -8,11 +8,11 @@ test.describe('Export CSV/PDF', () => {
     await page.getByRole('button', { name: 'Se connecter' }).click();
     await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible();
     await page.getByRole('button', { name: 'Export' }).click();
-    await expect(page.locator('h1')).toContainText('Export');
+    await expect(page.getByRole('heading', { name: 'Export' })).toBeVisible();
   });
 
   test('affiche le titre et les 5 types d\'export', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('Export');
+    await expect(page.getByRole('heading', { name: 'Export' })).toBeVisible();
     await expect(page.getByText("Type d'export")).toBeVisible();
 
     await expect(page.getByText('Élèves')).toBeVisible();
