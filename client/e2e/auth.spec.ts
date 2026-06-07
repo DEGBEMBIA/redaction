@@ -21,7 +21,7 @@ test.describe('Authentification', () => {
     await expect(page.locator('text=Suivi Rédaction')).toBeVisible();
     // Vérifier le profil utilisateur dans la sidebar
     await expect(page.locator('text=Professeur Admin')).toBeVisible();
-    await expect(page.locator('text=admin')).toBeVisible();
+    await expect(page.getByText('admin', { exact: true })).toBeVisible();
   });
 
   test('échec de connexion avec mauvais mot de passe', async ({ page }) => {
