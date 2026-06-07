@@ -31,11 +31,13 @@ test.describe('Export CSV/PDF', () => {
 
   test("le type Élèves affiche les entêtes du tableau", async ({ page }) => {
     await expect(page.getByText('Liste des élèves')).toBeVisible();
-    await expect(page.getByText('Nom')).toBeVisible();
-    await expect(page.getByText('Prénom')).toBeVisible();
-    await expect(page.getByText('Email')).toBeVisible();
-    await expect(page.getByText('Classe')).toBeVisible();
-    await expect(page.getByText("Date d'inscription")).toBeVisible();
+    // Scoper les entêtes au tableau pour éviter les conflits ("Nom" match aussi "Prénom")
+    const table = page.locator('.lg\\:col-span-3 table');
+    await expect(table.getByText('Nom', { exact: true })).toBeVisible();
+    await expect(table.getByText('Prénom', { exact: true })).toBeVisible();
+    await expect(table.getByText('Email', { exact: true })).toBeVisible();
+    await expect(table.getByText('Classe', { exact: true })).toBeVisible();
+    await expect(table.getByText("Date d'inscription", { exact: true })).toBeVisible();
   });
 
   test('bascule entre les types d\'export', async ({ page }) => {
