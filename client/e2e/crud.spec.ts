@@ -39,9 +39,11 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
     test('supprime une classe', async ({ page }) => {
       await page.getByRole('button', { name: 'Classes' }).click();
 
-      // Compter les classes avant
+      // Attendre que les classes soient chargées depuis l'API
+      await expect(page.locator('.grid')).toBeVisible({ timeout: 5000 });
       const cards = page.locator('.grid > div');
       const countBefore = await cards.count();
+      expect(countBefore).toBeGreaterThanOrEqual(1);
 
       // Accepter la boîte de dialogue confirm()
       page.once('dialog', async (dialog) => {
@@ -90,6 +92,8 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
       // Titre
       await page.locator('.fixed input[type="text"]').first().fill(`Exercice E2E ${UID}`);
 
+      // Attendre que les classes soient chargées dans le select (2 options min : "Toutes" + seed)
+      await expect(page.locator('.fixed select option')).toHaveCount(2, { timeout: 5000 });
       // Sélectionner la classe (première option non-vide)
       await page.locator('.fixed select').first().selectOption({ index: 1 });
 
