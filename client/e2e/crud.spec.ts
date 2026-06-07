@@ -110,12 +110,12 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
       await page.getByRole('button', { name: "Grille d'évaluation" }).click();
       await expect(page.getByRole('heading', { name: "Grille d'évaluation" })).toBeVisible();
 
-      await expect(page.getByText('Orthographe')).toBeVisible();
-      await expect(page.getByText('Grammaire')).toBeVisible();
-      await expect(page.getByText('Vocabulaire')).toBeVisible();
-      await expect(page.getByText('Structure')).toBeVisible();
-      await expect(page.getByText('Style')).toBeVisible();
-      await expect(page.getByText('Ponctuation')).toBeVisible();
+      await expect(page.getByText('Orthographe', { exact: true })).toBeVisible();
+      await expect(page.getByText('Grammaire', { exact: true })).toBeVisible();
+      await expect(page.getByText('Vocabulaire', { exact: true })).toBeVisible();
+      await expect(page.getByText('Structure', { exact: true })).toBeVisible();
+      await expect(page.getByText('Style', { exact: true })).toBeVisible();
+      await expect(page.getByText('Ponctuation', { exact: true })).toBeVisible();
     });
 
     test('ajoute un critère', async ({ page }) => {
@@ -147,7 +147,7 @@ test.describe('Gestion des classes, élèves, exercices et critères', () => {
 
       for (const { button } of pages) {
         await page.getByRole('button', { name: button }).click();
-        await expect(page.getByRole('heading')).first().toBeVisible({ timeout: 5000 });
+        await expect(page.getByRole('heading').first()).toBeVisible({ timeout: 5000 });
       }
     });
   });
